@@ -1,0 +1,6 @@
+{
+  "version": "2",
+  "remote": {
+    "https://deno.land/x/flags@0.0.3/mod.ts": "cd018a29ad97683ea674203c00a75144844a1f53169f923529eba70048825d9a"
+  }
+}
