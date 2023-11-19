@@ -1,5 +1,6 @@
 {
 	"tasks": {
-		"exec": "deno run --allow-read --allow-write main.ts"
+		"exec": "deno run --allow-read --allow-write main.ts",
+		"cache": "deno cache --lock-write main.ts && deno check main.ts"
 	}
 }
