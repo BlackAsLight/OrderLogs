@@ -25,7 +25,7 @@ new Parser(new Command({
 		})
 		return async function (_args) {
 			if ((flags.find('version') as FlagBoolean).value)
-				return console.log('Version: v2.0.0')
+				return console.log('Version: v2.0.1')
 
 			console.log((
 				await merge(

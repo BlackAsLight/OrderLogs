@@ -32,37 +32,37 @@ export async function merge(inDir: string, outDir: string, deleteSource: boolean
 		return performance.now() - startTime
 
 	const outFiles: Record<string, undefined | Deno.FsFile> = {}
-	while (inFiles.length) {
-		const readers = await Promise.all(inFiles.splice(0, 100).map(async file => {
-			const reader = getLog(file)
-			await reader.next()
-			const log = (await reader.next()).value
-			return {
-				file,
-				reader,
-				log,
-				timeStamp: log ? getTimeStamp(log) : 0
-			}
-		}))
-		while (true) {
-			readers.sort((x, y) => x.timeStamp - y.timeStamp)
-			while (readers[ 0 ] && readers[ 0 ].log == undefined) {
-				if (deleteSource)
-					Deno.remove(readers[ 0 ].file)
-				readers.shift()
-			}
-			if (!readers.length)
-				break
-
-			const date = getDate(readers[ 0 ].timeStamp)
-			if (outFiles[ date ] == undefined)
-				outFiles[ date ] = await Deno.create(outDir + '/' + date + '.log')
-
-			await outFiles[ date ]!.write(new TextEncoder().encode(readers[ 0 ].log + '\n'))
-			readers[ 0 ].log = (await readers[ 0 ].reader.next()).value
-			readers[ 0 ].timeStamp = readers[ 0 ].log ? getTimeStamp(readers[ 0 ].log) : 0
+	// while (inFiles.length) {
+	const readers = await Promise.all(inFiles/*.splice(0, 100)*/.map(async file => {
+		const reader = getLog(file)
+		await reader.next()
+		const log = (await reader.next()).value
+		return {
+			file,
+			reader,
+			log,
+			timeStamp: log ? getTimeStamp(log) : 0
 		}
+	}))
+	while (true) {
+		readers.sort((x, y) => x.timeStamp - y.timeStamp)
+		while (readers[ 0 ] && readers[ 0 ].log == undefined) {
+			if (deleteSource)
+				Deno.remove(readers[ 0 ].file)
+			readers.shift()
+		}
+		if (!readers.length)
+			break
+
+		const date = getDate(readers[ 0 ].timeStamp)
+		if (outFiles[ date ] == undefined)
+			outFiles[ date ] = await Deno.create(outDir + '/' + date + '.log')
+
+		await outFiles[ date ]!.write(new TextEncoder().encode(readers[ 0 ].log + '\n'))
+		readers[ 0 ].log = (await readers[ 0 ].reader.next()).value
+		readers[ 0 ].timeStamp = readers[ 0 ].log ? getTimeStamp(readers[ 0 ].log) : 0
 	}
+	// }
 	for (const key in outFiles) {
 		outFiles[ key ]!.close()
 		tar.compress(outDir + '/' + key + '.log', outDir + '/' + key + '.log.tar', { debug: false, excludeSrc: true })
